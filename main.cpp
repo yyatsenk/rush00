@@ -3,14 +3,6 @@
 #include "Player.hpp"
 #include <ctime>
 
-void wait ( int seconds )
-{
-  clock_t endwait;
-  endwait = clock () + seconds * CLOCKS_PER_SEC ;
-  while (clock() < endwait) {}
-}
-
-
 void				createEnemy(Enemy **e, WINDOW * w)
 {
 	int 			i;
@@ -89,9 +81,6 @@ int					main()
 	refresh();
 	wrefresh(statmenu);
 	mvwprintw(statmenu, 3, 1, "HP : %d", 100);
-	
-
-
 	//!!!!!!!!!!!!!
 	WINDOW * menuwin = newwin(30, 80, (yMax/2) - 10, 10);
 	Enemy		**e = new Enemy *[64];
@@ -99,22 +88,18 @@ int					main()
 	nodelay(menuwin, true);
 	refresh();
 	wrefresh(menuwin);
-	int i;
-	unsigned int		z;
+	int i = -1;
+	unsigned int		z = 0;
+	int flag = 0;
 
-	i = -1;
-	z = 0;
 	curs_set(0);
 	while (++i < 64)
 		e[i] = NULL;
 	Player *p = new Player(menuwin, 1, 1, '$');
 
-	//std::srand(time(NULL));
-	//t1 = clock();
 	std::cout << t1 << "\n";
 	while (1)
 	{
-		//t1 = clock();
 		deleteEnemy(p, e, my_score);
 		if (my_score > 80)
 		{ 
@@ -122,18 +107,16 @@ int					main()
 			my_score = 0;
 			enemy_speed /= 2;
 		}
-		//t2 = clock();
-		//sec += t1 /1000.0;
-		//wait(1);
-		//sec++;
-		
-		if (sec >= 60)
+		sec = (int)(clock()/1000000.0) % 60;
+		if (sec == 59 && flag == 0)
 		{
-			sec = 0;
+			flag = 1;
 			min++;
 		}
-		mvwprintw(statmenu, 1, 1, "Timer : %i:%i", min, sec);
-		mvwprintw(statmenu, 2, 1, "Score: %i", my_score);
+		if (sec < 59)
+			flag = 0;
+		mvwprintw(statmenu, 1, 1, "Timer : %02i:%02i", min, sec);
+		mvwprintw(statmenu, 2, 1, "Score: %02i", my_score);
 		mvwprintw(statmenu, 4, 1, "Level : %d", level);
 		wrefresh(statmenu);
 		p->deleteBullet();
@@ -147,9 +130,10 @@ int					main()
 		p->display();
 		wrefresh(menuwin);
 		z++;
+		//std::cout << "runtime = " << clock()/1000000.0 << std::endl;
 	}
 	getch();
 	endwin();
 	return (0);
-	std::cout << "runtime = " << clock()/1000.0 << std::endl; // время работы программы                
+	//std::cout << "runtime = " << clock()/1000.0 << std::endl; // время работы программы                
 }
